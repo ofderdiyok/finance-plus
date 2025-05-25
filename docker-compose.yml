@@ -5,6 +5,25 @@ services:
     build:
       context: ./backend
     ports:
-      - "8080:8080"
+      - "8080:80"
+    depends_on:
+      - db
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=financeplusdb;Username=financeuser;Password=financepass
+
+  db:
+    image: postgres:15
+    container_name: financeplus-db
+    restart: always
+    environment:
+      POSTGRES_USER: financeuser
+      POSTGRES_PASSWORD: financepass
+      POSTGRES_DB: financeplusdb
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

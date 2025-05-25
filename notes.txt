@@ -2,3 +2,29 @@ docker ps
 tüm containerleri durdur:
 docker stop $(docker ps -q)
 docker system prune -f
+
+servisleri ayaga kaldiririz
+docker compose up --build
+
+tüm containerları ve volume silmek
+docker compose down -v
+docker compose down
+
+migration olustur
+dotnet ef migrations add InitialCreate
+
+veritabani olustur/güncelle
+dotnet ef database update
+
+migrationları temizle
+rm -rf Migrations
+
+ef tool komutlari
+dotnet tool install --global dotnet-ef
+dotnet tool update --global dotnet-ef
+
+ef core + postgresql nuget
+dotnet add package Microsoft.EntityFrameworkCore
+dotnet add package Microsoft.EntityFrameworkCore.Design
+dotnet add package Npgsql.EntityFrameworkCore.PostgreSQL
+
