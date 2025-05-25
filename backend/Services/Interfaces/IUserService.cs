@@ -9,5 +9,6 @@ namespace FinancePlus.Services.Interfaces
         Task<User> CreateAsync(User user);
         Task<User?> UpdateAsync(Guid uuid, User updatedUser);
         Task<bool> DeleteAsync(Guid uuid);
+        Task<User?> AuthenticateAsync(string email, string password);
     }
 }

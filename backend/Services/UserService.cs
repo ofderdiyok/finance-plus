@@ -26,10 +26,13 @@ namespace FinancePlus.Services
 
         public async Task<User> CreateAsync(User user)
         {
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password!); // 🔒 null kontrolü (!)
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
         }
+
+
 
         public async Task<User?> UpdateAsync(Guid uuid, User updatedUser)
         {
@@ -57,5 +60,17 @@ namespace FinancePlus.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<User?> AuthenticateAsync(string email, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                return null;
+            }
+
+            return user;
+        }
+
     }
 }
