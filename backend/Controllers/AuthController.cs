@@ -1,6 +1,9 @@
 using FinancePlus.Data;
 using FinancePlus.Models;
 using FinancePlus.Services.Interfaces;
+using FinancePlus.Requests;
+using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancePlus.Controllers
@@ -18,6 +21,7 @@ namespace FinancePlus.Controllers
             _tokenService = tokenService;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -31,6 +35,32 @@ namespace FinancePlus.Controllers
             var token = _tokenService.GenerateToken(user);
             return Ok(new { token });
         }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        {
+            // email kullanilmis mi
+            var existingUser = await _userService.GetAllAsync();
+            if (existingUser.Any(u => u.Email == request.Email))
+                return BadRequest("Email already in use.");
+
+            var user = new User
+            {
+                FullName = request.FullName,
+                Email = request.Email,
+                IBAN = request.IBAN,
+                Currency = request.Currency,
+                UserType = (UserType) request.UserType,
+                Password = request.Password 
+            };
+
+            var createdUser = await _userService.CreateAsync(user);
+
+            var token = _tokenService.GenerateToken(createdUser);
+            return Ok(new { token });
+        }
+
     }
 
     public class LoginRequest

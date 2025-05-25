@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using FinancePlus.Models;
 using FinancePlus.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace FinancePlus.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
