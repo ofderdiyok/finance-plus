@@ -1,5 +1,6 @@
 using FinancePlus.Models;
 
+
 namespace FinancePlus.Services.Interfaces
 {
     public interface IUserService
@@ -10,5 +11,7 @@ namespace FinancePlus.Services.Interfaces
         Task<User?> UpdateAsync(Guid uuid, User updatedUser);
         Task<bool> DeleteAsync(Guid uuid);
         Task<User?> AuthenticateAsync(string email, string password);
+        Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? search, string? sortBy, string? sortDir);
+
     }
 }

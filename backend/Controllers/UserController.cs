@@ -3,7 +3,6 @@ using FinancePlus.Models;
 using FinancePlus.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace FinancePlus.Controllers
 {
     [ApiController]
@@ -19,11 +18,18 @@ namespace FinancePlus.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? search = null,
+            [FromQuery] string? sortBy = null,
+            [FromQuery] string? sortDir = "asc")
         {
-            var users = await _service.GetAllAsync();
-            return Ok(users);
+            var result = await _service.GetPagedAsync(page, pageSize, search, sortBy, sortDir);
+            return Ok(result);
         }
+
+
 
         [HttpGet("{uuid}")]
         public async Task<IActionResult> GetByUuid(Guid uuid)

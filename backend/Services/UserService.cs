@@ -3,6 +3,7 @@ using FinancePlus.Models;
 using FinancePlus.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FinancePlus.Services
 {
     public class UserService : IUserService
@@ -26,7 +27,7 @@ namespace FinancePlus.Services
 
         public async Task<User> CreateAsync(User user)
         {
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password!); // 🔒 null kontrolü (!)
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password!);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
@@ -70,6 +71,38 @@ namespace FinancePlus.Services
             }
 
             return user;
+        }
+
+        public async Task<PagedResult<User>> GetPagedAsync(int page, int pageSize, string? search, string? sortBy, string? sortDir)
+        {
+            var query = _context.Users.Where(u => !u.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.FullName.ToLower().Contains(search.ToLower()) ||
+                    u.Email.ToLower().Contains(search.ToLower()));
+            }
+
+            bool descending = (sortDir?.ToLower() == "desc");
+            query = sortBy?.ToLower() switch
+            {
+                "fullname" => descending ? query.OrderByDescending(u => u.FullName) : query.OrderBy(u => u.FullName),
+                "email" => descending ? query.OrderByDescending(u => u.Email) : query.OrderBy(u => u.Email),
+                "createdat" => descending ? query.OrderByDescending(u => u.CreatedAt) : query.OrderBy(u => u.CreatedAt),
+                _ => query.OrderBy(u => u.FullName) 
+            };
+
+            var total = await query.CountAsync();
+            var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<User>
+            {
+                Items = items,
+                TotalCount = total,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
     }
