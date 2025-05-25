@@ -1,0 +1,4 @@
+docker ps
+tüm containerleri durdur:
+docker stop $(docker ps -q)
+docker system prune -f
