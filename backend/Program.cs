@@ -35,7 +35,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            NameClaimType = "sub"
         };
     });
 
@@ -44,6 +45,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ITransactionService, TransactionService>();
+builder.Services.AddScoped<ITransferService, TransferService>();
+
 
 builder.Services.AddCors(options =>
 {
@@ -55,16 +60,14 @@ builder.Services.AddCors(options =>
     });
 });
 
-// --- Build aşamasından sonra middleware ayarlanmalı ---
 var app = builder.Build();
 
-// --- Middleware ---
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseCors("AllowAll"); // şimdi doğru yerde
+app.UseCors("AllowAll"); 
 
-app.UseAuthentication(); // JWT önce çalışmalı
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();

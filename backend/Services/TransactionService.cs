@@ -43,14 +43,16 @@ namespace FinancePlus.Services
             };
         }
 
-        public async Task<PagedResult<Transaction>> GetPagedByUserAsync(Guid userUuid, int page, int pageSize, string? search, string? sortBy, string? sortDir)
+        public async Task<PagedResult<Transaction>> GetPagedByUserAsync(Guid userUuid, int page, int pageSize, string? search, string? sortBy, string? sortDir, Guid? categoryUuid = null)
         {
-            var query = _context.Transactions.Where(t => t.UserUuid == userUuid && !t.IsDeleted);
+            var query = _context.Transactions
+                .Where(t => t.UserUuid == userUuid && !t.IsDeleted);
 
             if (!string.IsNullOrWhiteSpace(search))
-            {
                 query = query.Where(t => t.Description.ToLower().Contains(search.ToLower()));
-            }
+
+            if (categoryUuid.HasValue)
+                query = query.Where(t => t.CategoryUuid == categoryUuid.Value);
 
             bool desc = sortDir?.ToLower() == "desc";
             query = sortBy?.ToLower() switch

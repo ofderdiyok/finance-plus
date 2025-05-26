@@ -12,11 +12,11 @@ const AppMenu = () => {
 
     const model: AppMenuItem[] = [
         {
-            label: 'Home',
+            label: 'Hoş geldiniz!',
             items: [{ label: 'Ana Sayfa', icon: 'pi pi-fw pi-home', to: '/' }]
         },
         {
-            label: 'Finansal İşlemlerim',
+            label: 'Fİnansal İşlemlerİm',
             items: [
                 {
                     label: 'Transferlerim',
@@ -30,6 +30,14 @@ const AppMenu = () => {
                 }
             ]
         },
+        {
+            label: 'Menü',
+            items: [
+                { label: 'Profil', icon: 'pi pi-fw pi-user', to: '/profilim' },
+                { label: 'Ayarlar', icon: 'pi pi-fw pi-cog', to: '/ayarlar' }
+
+            ]
+        }
         
     ];
 

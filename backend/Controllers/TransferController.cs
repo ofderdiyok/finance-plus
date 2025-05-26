@@ -26,7 +26,8 @@ namespace FinancePlus.Controllers
             [FromQuery] string? sortBy = null,
             [FromQuery] string? sortDir = "desc")
         {
-            var senderUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var senderUuid =  Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var result = await _service.GetPagedBySenderAsync(senderUuid, page, pageSize, search, sortBy, sortDir);
             return Ok(result);
         }
@@ -34,7 +35,8 @@ namespace FinancePlus.Controllers
         [HttpPost("me")]
         public async Task<IActionResult> Create(Transfer transfer)
         {
-            var senderUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var senderUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
             var created = await _service.CreateAsync(senderUuid, transfer);
             return CreatedAtAction(nameof(GetMyTransfers), new { uuid = created.Uuid }, created);
         }
@@ -42,7 +44,7 @@ namespace FinancePlus.Controllers
         [HttpDelete("me/{uuid}")]
         public async Task<IActionResult> Delete(Guid uuid)
         {
-            var senderUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var senderUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var success = await _service.DeleteAsync(senderUuid, uuid);
             return success ? NoContent() : NotFound();
         }

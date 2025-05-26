@@ -36,17 +36,19 @@ namespace FinancePlus.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string? search = null,
             [FromQuery] string? sortBy = null,
-            [FromQuery] string? sortDir = "desc")
+            [FromQuery] string? sortDir = "desc",
+            [FromQuery] Guid? categoryUuid = null)
         {
-            var userUuid = Guid.Parse(User.FindFirstValue("sub")!);
-            var result = await _service.GetPagedByUserAsync(userUuid, page, pageSize, search, sortBy, sortDir);
+            var userUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _service.GetPagedByUserAsync(userUuid, page, pageSize, search, sortBy, sortDir, categoryUuid);
             return Ok(result);
         }
+
 
         [HttpPost("me")]
         public async Task<IActionResult> Create(Transaction transaction)
         {
-            var userUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var userUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var created = await _service.CreateAsync(userUuid, transaction);
             return CreatedAtAction(nameof(GetMyTransactions), new { uuid = created.Uuid }, created);
         }
@@ -54,7 +56,7 @@ namespace FinancePlus.Controllers
         [HttpPut("me/{uuid}")]
         public async Task<IActionResult> Update(Guid uuid, Transaction transaction)
         {
-            var userUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var userUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var updated = await _service.UpdateAsync(userUuid, uuid, transaction);
             return updated == null ? NotFound() : Ok(updated);
         }
@@ -62,7 +64,7 @@ namespace FinancePlus.Controllers
         [HttpDelete("me/{uuid}")]
         public async Task<IActionResult> Delete(Guid uuid)
         {
-            var userUuid = Guid.Parse(User.FindFirstValue("sub")!);
+            var userUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var success = await _service.DeleteAsync(userUuid, uuid);
             return success ? NoContent() : NotFound();
         }
