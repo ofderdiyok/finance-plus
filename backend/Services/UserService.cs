@@ -28,10 +28,12 @@ namespace FinancePlus.Services
         public async Task<User> CreateAsync(User user)
         {
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password!);
+            user.Asset = 0; // 💰 Varsayılan değer olarak sıfır atanıyor
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
             return user;
         }
+
 
 
 

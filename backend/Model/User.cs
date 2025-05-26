@@ -23,6 +23,8 @@ namespace FinancePlus.Models
 
         public string? Currency { get; set; } = "TRY";
 
+        public long Asset { get; set; } = 0;
+
         public UserType UserType { get; set; } = UserType.Regular;
 
         public ICollection<Transaction>? Transactions { get; set; }
