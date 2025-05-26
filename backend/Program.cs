@@ -9,6 +9,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// --- Web Host Ayarı ---
 builder.WebHost.UseUrls("http://*:80");
 
 // --- Services ---
@@ -44,11 +45,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+// --- Build aşamasından sonra middleware ayarlanmalı ---
 var app = builder.Build();
 
 // --- Middleware ---
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseCors("AllowAll"); // şimdi doğru yerde
 
 app.UseAuthentication(); // JWT önce çalışmalı
 app.UseAuthorization();
