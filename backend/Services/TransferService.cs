@@ -66,5 +66,11 @@ namespace FinancePlus.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task SaveAsync()
+        {
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

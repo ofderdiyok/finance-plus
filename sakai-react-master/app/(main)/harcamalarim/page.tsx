@@ -29,6 +29,11 @@ export default function HarcamalarimPage() {
     const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('');
 
     const router = useRouter();
+    const dropdownOptions = [
+        { name: 'Tümü', uuid: '' },
+        ...categories
+    ];
+
 
     useEffect(() => {
         const stored = localStorage.getItem('token');
@@ -59,22 +64,29 @@ export default function HarcamalarimPage() {
             setCategories(data.items);
         })
         .catch(console.error);
-
     }, [token, page, rows]);
+
+    useEffect(() => {
+        if (token) {
+            fetchTransactions();
+        }
+    }, [token, page, rows, selectedCategoryFilter]);
+
 
     const fetchTransactions = async () => {
         if (!token) return;
 
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8080/api/transaction/me?page=${page + 1}&pageSize=${rows}&sortBy=createdAt&sortDir=desc${selectedCategoryFilter ? `&categoryUuid=${selectedCategoryFilter}` : ''}`, {
+            const categoryUuid = selectedCategoryFilter ? selectedCategoryFilter : null;
+
+            const res = await fetch(`http://localhost:8080/api/transaction/me?page=${page + 1}&pageSize=${rows}&sortBy=createdAt&sortDir=desc${selectedCategoryFilter ? `&categoryUuid=${categoryUuid}` : ''}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
             if (!res.ok) throw new Error('Veriler alınamadı');
-
             const data = await res.json();
             setTransactions(data.items);
             setTotal(data.totalCount);
@@ -144,15 +156,15 @@ export default function HarcamalarimPage() {
 
             <div className="mb-3 flex justify-content-between align-items-center">
                 <Dropdown
-                    value={selectedCategoryFilter}
-                    options={categories}
+                    value={selectedCategoryFilter ?? ''}
+                    options={dropdownOptions}
                     optionLabel="name"
                     optionValue="uuid"
                     placeholder="Kategori Filtrele"
                     onChange={(e) => {
+                        console.log(e.value)
                         setSelectedCategoryFilter(e.value);
                         setPage(0);
-                        fetchTransactions();
                     }}
                     className="w-15rem"
                 />

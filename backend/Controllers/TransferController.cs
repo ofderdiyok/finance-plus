@@ -41,6 +41,28 @@ namespace FinancePlus.Controllers
             return CreatedAtAction(nameof(GetMyTransfers), new { uuid = created.Uuid }, created);
         }
 
+        [HttpPut("me/{uuid}")]
+        public async Task<IActionResult> Update(Guid uuid, Transfer transfer)
+        {
+            var senderUuid = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var existing = await _service.GetByUuidAsync(uuid);
+
+            if (existing == null || existing.senderUuid != senderUuid)
+                return NotFound();
+
+            existing.Amount = transfer.Amount;
+            existing.Description = transfer.Description;
+            existing.ReceiverUuid = transfer.ReceiverUuid;
+            existing.TransferType = transfer.TransferType;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            //track eder saveler.
+            await _service.SaveAsync(); 
+
+            return Ok(existing);
+        }
+
+
         [HttpDelete("me/{uuid}")]
         public async Task<IActionResult> Delete(Guid uuid)
         {

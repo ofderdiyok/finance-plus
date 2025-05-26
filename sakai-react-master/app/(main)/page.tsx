@@ -79,7 +79,7 @@ export default function Dashboard() {
             .catch(() => setRates(null));
             
         if (uuid) {
-            fetch(`http://localhost:8080/api/transfer/paged?senderUuid=${uuid}&page=1&pageSize=10&sortBy=createdAt&sortDir=desc`, {
+            fetch(`http://localhost:8080/api/transfer/me?page=1&pageSize=10&sortBy=createdAt&sortDir=desc`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
