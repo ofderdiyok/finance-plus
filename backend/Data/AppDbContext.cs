@@ -18,32 +18,6 @@ namespace FinancePlus.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            // Transaction → User
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.User)
-                .WithMany(u => u.Transactions)
-                .HasForeignKey(t => t.UserId);
-
-            // Transaction → Category
-            modelBuilder.Entity<Transaction>()
-                .HasOne(t => t.Category)
-                .WithMany(c => c.Transactions)
-                .HasForeignKey(t => t.CategoryId);
-
-            // Transfer → Sender
-            modelBuilder.Entity<Transfer>()
-                .HasOne(t => t.Sender)
-                .WithMany(u => u.TransfersSent)
-                .HasForeignKey(t => t.SenderId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            // Transfer → Receiver
-            modelBuilder.Entity<Transfer>()
-                .HasOne(t => t.Receiver)
-                .WithMany(u => u.TransfersReceived)
-                .HasForeignKey(t => t.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

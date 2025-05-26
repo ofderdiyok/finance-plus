@@ -1,29 +1,23 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace FinancePlus.Models
 {
     public class Transfer : BaseEntity
     {
+        [JsonIgnore]
+        public Guid senderUuid { get; set; }
+
         [Required]
-        public int SenderId { get; set; }
-
-        public User? Sender { get; set; }
-
-        public int? ReceiverId { get; set; }
-
-        public User? Receiver { get; set; }
-
-        public string? ReceiverIBAN { get; set; }
+        public Guid ReceiverUuid { get; set; }
 
         [Required]
         public decimal Amount { get; set; }
 
+        public string Description { get; set; } = string.Empty;
+
         [Required]
-        public string? ReferenceCode { get; set; }
-
-        public TransferType Type { get; set; }
-
-        public bool Verified { get; set; } = false;
+        public TransferType TransferType { get; set; }
 
         public DateTime Date { get; set; } = DateTime.UtcNow;
     }
@@ -31,7 +25,6 @@ namespace FinancePlus.Models
     public enum TransferType
     {
         Internal,
-        EFT,
-        FAST
+        IBAN
     }
 }
