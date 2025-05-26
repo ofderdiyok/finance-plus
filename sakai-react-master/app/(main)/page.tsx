@@ -28,6 +28,7 @@ export default function Dashboard() {
     } | null>(null);
     const [transfers, setTransfers] = useState<any[]>([]);
     const [transactions, setTransactions] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
 
     const router = useRouter();
 
@@ -53,7 +54,16 @@ export default function Dashboard() {
             })
             .then((data) => setUser(data))
             .catch(() => setUser(null));
-        
+
+        fetch('http://localhost:8080/api/user', {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(res => res.json())
+            .then(data => setUsers(data.items ?? []))
+            .catch(() => setUsers([]));
+
         fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold,silver-tokenized-stock-defichain&vs_currencies=try,usd')
             .then(res => res.json())
             .then(data => {
@@ -72,12 +82,11 @@ export default function Dashboard() {
                 });
             })
 
-
         fetch('https://api.frankfurter.app/latest?from=TRY&to=USD,EUR,GBP,CHF,JPY')
             .then((res) => res.json())
             .then((data) => setRates(data.rates))
             .catch(() => setRates(null));
-            
+
         if (uuid) {
             fetch(`http://localhost:8080/api/transfer/me?page=1&pageSize=10&sortBy=createdAt&sortDir=desc`, {
                 headers: {
@@ -96,8 +105,11 @@ export default function Dashboard() {
                 .then(data => setTransactions(data.items))
                 .catch(() => setTransactions([]));
         }
-
     }, []);
+
+    const getReceiverName = (uuid: string) => {
+        return users.find(u => u.uuid === uuid)?.fullName || uuid;
+    };
 
     if (!user) {
         return (
@@ -235,12 +247,12 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            <div className="card p-4">
+           <div className="card p-4">
                 <h5 className="mb-3">Son 10 Transfer</h5>
 
                 {transfers.length > 0 ? (
                     <DataTable value={transfers} responsiveLayout="scroll">
-                        <Column field="receiverUuid" header="Alıcı" />
+                        <Column header="Alıcı" body={(row) => getReceiverName(row.receiverUuid)} />
                         <Column field="amount" header="Tutar" body={(row) => `${row.amount} ₺`} />
                         <Column field="description" header="Açıklama" />
                         <Column field="date" header="Tarih" body={(row) => new Date(row.date).toLocaleDateString('tr-TR')} />
@@ -261,6 +273,7 @@ export default function Dashboard() {
                     />
                 </div>
             </div>
+
 
             <div className="card p-4 mt-4">
                 <h5 className="mb-3">Son 10 Harcama</h5>
